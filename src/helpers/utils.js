@@ -1,0 +1,54 @@
+import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
+
+// return the user data from the local storage
+export const getUser = () => {
+  const userStr = localStorage.getItem('user');
+  if (userStr) return JSON.parse(userStr);
+  else return null;
+};
+
+// return the token from the local storage
+export const getToken = () => {
+  return localStorage.getItem('token') || null;
+};
+
+// remove the token and user from the local storage
+export const removeUserSession = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+};
+
+// set the token and user from the local storage
+export const setUserSession = (token, user) => {
+  localStorage.setItem('token', token);
+  localStorage.setItem('user', JSON.stringify(user));
+};
+
+// handle the routes based on role
+export const PrivateRoute = ({ component: Component, roles, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        const user = getUser();
+        if (!user && !getToken()) {
+          // not logged in
+          return (
+            <Redirect
+              to={{ pathname: '/login', state: { from: props.location } }}
+            />
+          );
+        }
+
+        // check if route is restricted by role
+        if (roles && roles.indexOf(user.role) === -1) {
+          // role not authorised
+          return <Redirect to={{ pathname: '/error' }} />;
+        }
+        // authorised so return component
+        return <Component {...props} />;
+      }}
+    />
+  );
+};
