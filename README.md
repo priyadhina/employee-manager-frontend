@@ -1,5 +1,5 @@
 # Employee-Manager-project Frontend
-Front end repo for employee manager project
+Frontend repo for employee manager project
 
 
 **Getting Started**
